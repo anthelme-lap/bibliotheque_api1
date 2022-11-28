@@ -7,6 +7,7 @@ use App\Repository\BookRepository;
 use App\Repository\AuthorRepository;
 use App\Repository\CategoryRepository;
 use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class BookController extends AbstractController
 {
@@ -63,9 +65,10 @@ class BookController extends AbstractController
 
 
     #[Route('/api/books', name: 'createBook', methods:["POST"])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits necessaires pour créer un livre.')]
     public function createbook(
         Request $request, ValidatorInterface $validator,
-        AuthorRepository $authorRepos, 
+        AuthorRepository $authorRepos, SluggerInterface $slugger,
         SerializerInterface $serializer,  CategoryRepository $categoryRepos,
         BookRepository $bookRepos): JsonResponse
     {
@@ -89,9 +92,10 @@ class BookController extends AbstractController
 
         $category = $categoryRepos->find($content['idCategory']);
 
-
+        $slugerTitle = $slugger->slug($content['slug'], '-');
         // dd($author);
         $book->setAuthor($author);
+        $book->setSlug($slugerTitle);
 
         $book->setCategory($category);
         
@@ -106,6 +110,7 @@ class BookController extends AbstractController
 
 
     #[Route('/api/books/{id}', name: 'editBook', methods:["PUT"])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits necessaires pour modifier un livre.')]
     public function editbook(
         Request $request, ValidatorInterface $validator,
         BookRepository $bookRepos, SerializerInterface $serializer,
@@ -128,7 +133,7 @@ class BookController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/books/{id}', name: 'detailBook', methods:["GET"])]
+    #[Route('/api/books/{slug}', name: 'detailBook', methods:["GET"])]
     public function show(SerializerInterface $serializer, Book $book): JsonResponse
     {
         if($book){
@@ -138,6 +143,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/api/books/{id}', name: 'deleteBokk', methods:["DELETE"])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits necessaires pour supprimer un livre.')]
     public function deleteBook(BookRepository $bookRepos, Book $book): JsonResponse
     {
         $bookRepos->remove($book, true);

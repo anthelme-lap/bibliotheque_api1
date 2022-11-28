@@ -10,10 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CategoryController extends AbstractController
 {
@@ -43,6 +44,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/category', name: 'createCategory', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits necessaires pour créer une catégorie.')]
     public function createCategory(CategoryRepository $categoryRepos,
     SerializerInterface $serializer, Request $request, ValidatorInterface $validator): JsonResponse
     {
@@ -64,6 +66,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/category/{id}', name: 'editCategory', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'avez pas les droits necessaires pour modifier une catégorie.')]
     public function editCategory(CategoryRepository $categoryRepos,
     SerializerInterface $serializer, Request $request, ValidatorInterface $validator,
     Category $currentCategory): JsonResponse
@@ -86,6 +89,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/category/{id}', name: 'deleteCategory', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', massage: 'Vous n\'avez pas les droits necessaires pour supprimer une catégorie.')]
     public function deleteCategory(CategoryRepository $categoryRepos, Category $category): JsonResponse
     {
         $categoryRepos->remove($category, true);
