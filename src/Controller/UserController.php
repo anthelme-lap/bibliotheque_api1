@@ -28,12 +28,17 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users', name: 'create_user', methods: ['POST'])]
-    public function createUser(UserRepository $userRepos, 
+    public function createUser(UserRepository $userRepos,  ValidatorInterface $validator,
         UserPasswordHasherInterface $userPasswordHasher,Request $request,
         SerializerInterface $serializer): JsonResponse
     {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+        $errors = $validator->validate($user);
 
+        if($errors->count() > 0){
+            $userJson = $serializer->serialize($errors, 'json', ['groups' => 'getUser']);
+            return new JsonResponse($userJson, Response::HTTP_BAD_REQUEST, [], true);
+        }
         $content = $request->toArray();
         $user->setEmail($content['username']);
         $user->setPassword($userPasswordHasher->hashPassword($user, $content['password']));
@@ -60,7 +65,7 @@ class UserController extends AbstractController
         $content = $request->toArray();
         $error = $validator->validate($user);
         if($error->count() > 0){
-            $userJson = $serializer->serialize($user, 'json', ['groups' => 'getUser']);
+            $userJson = $serializer->serialize($error, 'json', ['groups' => 'getUser']);
             return new JsonResponse($userJson, Response::HTTP_BAD_REQUEST, [], true);
         }
         

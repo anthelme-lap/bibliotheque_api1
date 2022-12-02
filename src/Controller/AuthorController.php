@@ -31,7 +31,7 @@ class AuthorController extends AbstractController
         $author = $paginator->paginate(
             $authorsList,
             $request->query->getInt('page', 1),
-            1
+            2
         );
 
         // On Transforme la liste des auteurs (objet) en tableau Serialisation

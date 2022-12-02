@@ -30,7 +30,7 @@ class BookController extends AbstractController
         $booksList = $paginator->paginate(
             $bookRepos->findBy([],['createdAt' => 'DESC']),
             $request->query->getInt('page', 1),
-            2
+            4
         );
         
         // On Transforme la liste des auteurs (objet) en tableau Serialisation
@@ -134,8 +134,12 @@ class BookController extends AbstractController
     }
 
     #[Route('/api/books/{slug}', name: 'detailBook', methods:["GET"])]
-    public function show(SerializerInterface $serializer, Book $book): JsonResponse
+    public function show(
+        Request $request,
+        SerializerInterface $serializer, 
+        Book $book): JsonResponse
     {
+
         if($book){
             $bookJson = $serializer->serialize($book, 'json',['groups' => 'getBook']);
             return new JsonResponse($bookJson, Response::HTTP_OK, [], true);

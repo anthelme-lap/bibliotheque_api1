@@ -8,10 +8,12 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookRepository;
 use App\Service\TimeStampTrait;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks()]
+#[UniqueEntity(fields: ['slug'], message: "Cet article existe déjà.")]
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
 {
@@ -20,32 +22,32 @@ class Book
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getBook','getAuthor'])]
+    #[Groups(['getBook','getAuthor', 'getCart'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getBook','getAuthor'])]
+    #[Groups(['getBook','getAuthor', 'getCart'])]
     #[Assert\NotBlank(message: "Le Titre de l'article ne doit pas etre vide.")]
     #[Assert\Length(min:1, max:255, minMessage: "Le Titre  doit avoir moins {{limit}} caractères.")]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['getBook'])]
+    #[Groups(['getBook', 'getCart'])]
     private ?string $description = null;
 
-    #[Groups(['getBook'])]
+    #[Groups(['getBook', 'getCart'])]
     #[ORM\ManyToOne(inversedBy: 'books')]
     private ?Author $author = null;
 
-    #[Groups(['getBook'])]
+    #[Groups(['getBook', 'getCart'])]
     #[ORM\ManyToOne(inversedBy: 'books')]
     private ?Category $category = null;
 
     #[ORM\Column]
-    #[Groups(['getBook'])]
+    #[Groups(['getBook', 'getCart'])]
     private ?bool $published = false;
 
-    #[Groups(['getBook'])]
+    #[Groups(['getBook' , 'getCart'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
@@ -54,8 +56,8 @@ class Book
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
+        // $this->createdAt = new \DateTimeImmutable();
+        // $this->updatedAt = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
     }
 

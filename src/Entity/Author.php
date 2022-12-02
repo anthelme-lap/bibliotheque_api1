@@ -17,11 +17,11 @@ class Author
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getBook','getAuthor'])]
+    #[Groups(['getBook','getAuthor', 'getCart'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getBook','getAuthor'])]
+    #[Groups(['getBook','getAuthor', 'getCart'])]
     #[Assert\NotBlank(message: "Nom de l'auteur est obligatoire.")]
     #[Assert\Length(min: 2, max: 255, minMessage: "Au moins 2 caratères")]
     private ?string $name = null;

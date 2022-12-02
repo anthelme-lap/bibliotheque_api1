@@ -20,17 +20,17 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getCategory', 'getBook'])]
+    #[Groups(['getCategory', 'getBook', 'getCart'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCategory','getBook'])]
+    #[Groups(['getCategory','getBook', 'getCart'])]
     #[Assert\NotBlank(message: "La catégorie ne doit pas etre vide.")]
     #[Assert\Length(min:2, max:50, minMessage: "La catégorie ne doit conteir au moins {{limit}} caractères .")]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['getCategory'])]
+    #[Groups(['getCategory', 'getCart'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[Groups(['getCategory'])]
